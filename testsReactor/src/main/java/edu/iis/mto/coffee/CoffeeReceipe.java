@@ -1,8 +1,9 @@
-package edu.iis.mto.testreactor.exc1;
+package edu.iis.mto.coffee;
+
+import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 
 public class CoffeeReceipe {
 
@@ -10,8 +11,8 @@ public class CoffeeReceipe {
     private final int milkAmount;
 
     private CoffeeReceipe(Builder builder) {
-        this.waterAmounts = Objects.requireNonNull(builder.waterAmounts);
-        this.milkAmount = builder.milkAmount;
+        this.waterAmounts = requireNonNull(builder.waterAmounts);
+        this.milkAmount = builder.milkAmount < 0 ? 0 : builder.milkAmount;
     }
 
     public int getMilkAmount() {

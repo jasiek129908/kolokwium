@@ -1,4 +1,4 @@
-package edu.iis.mto.testreactor.exc1;
+package edu.iis.mto.coffee.machine;
 
 public class Coffee {
 
@@ -9,7 +9,7 @@ public class Coffee {
         return waterAmount;
     }
 
-    public void setWaterAmount(int waterAmount) {
+    void setWaterAmount(int waterAmount) {
         this.waterAmount = waterAmount;
     }
 
@@ -17,7 +17,7 @@ public class Coffee {
         return milkAmout;
     }
 
-    public void setMilkAmout(int milkAmout) {
+    void setMilkAmout(int milkAmout) {
         this.milkAmout = milkAmout;
     }
 

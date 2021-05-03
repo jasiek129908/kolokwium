@@ -1,4 +1,4 @@
-package edu.iis.mto.testreactor.exc1;
+package edu.iis.mto.coffee.machine;
 
 public class NoCoffeeBeansException extends RuntimeException {
 
