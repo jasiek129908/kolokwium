@@ -22,21 +22,28 @@ public class CoffeeMachine {
 
     public Coffee make(CoffeeOrder order) {
         if (isNull(receipes.getReceipe(order.getType()))) {
-            throw new IllegalArgumentException("unknown for order " + order);
+            throw new CoffeeMachineException("unknown receipe for order " + order);
         }
         grindCoffee(order.getSize());
         Coffee coffee = create(order);
-        addMilk(order, coffee);
+        if (isMilkCoffee(order.getType())) {
+            addMilk(order, coffee);
+        }
         return coffee;
     }
 
     private void addMilk(CoffeeOrder order, Coffee coffee) {
-        if (isMilkCoffee(order.getType())) {
-            int milkAmount = receipes.getReceipe(order.getType())
-                                     .getMilkAmount();
+        int milkAmount = receipes.getReceipe(order.getType())
+                                 .getMilkAmount();
+        try {
             milkProvider.heat();
             int poured = milkProvider.pour(milkAmount);
+            if (poured > milkAmount) {
+                throw new CoffeeMachineException("milk overfill");
+            }
             coffee.setMilkAmout(poured);
+        } catch (Exception e) {
+            coffee.setMilkAmout(0);
         }
     }
 
@@ -47,7 +54,7 @@ public class CoffeeMachine {
 
     private void grindCoffee(CoffeeSize coffeeSize) {
         if (!grinder.grind(coffeeSize)) {
-            throw new NoCoffeeBeansException();
+            throw new CoffeeMachineException("no coffee beans available");
         }
     }
 
