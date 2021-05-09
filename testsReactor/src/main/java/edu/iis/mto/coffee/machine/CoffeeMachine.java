@@ -10,11 +10,11 @@ import edu.iis.mto.coffee.CoffeeType;
 
 public class CoffeeMachine {
 
-    private final Grinder grinder;
+    private final CoffeeGrinder grinder;
     private final MilkProvider milkProvider;
     private final CoffeeReceipes receipes;
 
-    public CoffeeMachine(Grinder grinder, MilkProvider milkProvider, CoffeeReceipes receipes) {
+    public CoffeeMachine(CoffeeGrinder grinder, MilkProvider milkProvider, CoffeeReceipes receipes) {
         this.grinder = requireNonNull(grinder, "ginder == null");
         this.milkProvider = requireNonNull(milkProvider, "milkProvider == null");
         this.receipes = requireNonNull(receipes, "receipes == null");
@@ -37,14 +37,11 @@ public class CoffeeMachine {
                                  .getMilkAmount();
         try {
             milkProvider.heat();
-            int poured = milkProvider.pour(milkAmount);
-            if (poured > milkAmount) {
-                throw new CoffeeMachineException("milk overfill");
-            }
-            coffee.setMilkAmout(poured);
         } catch (Exception e) {
-            coffee.setMilkAmout(0);
+            throw new CoffeeMachineException("milk provider error");
         }
+        int poured = milkProvider.pour(milkAmount);
+        coffee.setMilkAmout(poured);
     }
 
     private boolean isMilkCoffee(CoffeeType type) {
