@@ -2,6 +2,7 @@ package edu.iis.mto.coffee;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -44,12 +45,12 @@ class CoffeeMachineTest {
     @Test
     void methodMakeShouldThrowCoffeeMachineExceptionWhenThereIsNoRecipe() {
         coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
-        //when(coffeeReceipes.getReceipe(any(CoffeeType.class))).thenReturn(null);
         CoffeeOrder coffeeOrder = CoffeeOrder.builder()
                 .withSize(CoffeeSize.SMALL)
                 .withType(CoffeeType.ESPRESSO)
                 .build();
-        Assertions.assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+
+        assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
     }
 
     @Test
@@ -66,7 +67,7 @@ class CoffeeMachineTest {
                 .build();
 
         when(coffeeReceipes.getReceipe(any(CoffeeType.class))).thenReturn(coffeeReceipe);
-        Assertions.assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+        assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
     }
 
     @Test
@@ -107,6 +108,46 @@ class CoffeeMachineTest {
         when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
         when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
         doThrow(HeaterException.class).when(milkProvider).heat();
-        Assertions.assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+        assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
     }
+
+    @Test
+    void onSuccessShouldReturnCoffee() throws HeaterException {
+        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
+        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
+                .withSize(CoffeeSize.SMALL)
+                .withType(CoffeeType.ESPRESSO)
+                .build();
+
+        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
+                .withMilkAmount(10)
+                .withWaterAmounts(waterAmounts)
+                .build();
+
+        when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
+        when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
+        Coffee coffee = coffeeMachine.make(coffeeOrder);
+        assertNotNull(coffee);
+    }
+
+    @Test
+    void shouldPourProperAmountOfMilkToACoffee() {
+        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
+        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
+                .withSize(CoffeeSize.SMALL)
+                .withType(CoffeeType.ESPRESSO)
+                .build();
+
+        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
+                .withMilkAmount(10)
+                .withWaterAmounts(waterAmounts)
+                .build();
+
+        when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
+        when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
+        when(milkProvider.pour(coffeeReceipe.getMilkAmount())).thenReturn(coffeeReceipe.getMilkAmount());
+        Coffee make = coffeeMachine.make(coffeeOrder);
+        assertEquals(10,make.getMilkAmout());
+    }
+
 }
