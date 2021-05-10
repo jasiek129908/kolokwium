@@ -90,4 +90,23 @@ class CoffeeMachineTest {
         in.verify(milkProvider).heat();
         in.verify(milkProvider).pour(any(Integer.class));
     }
+
+    @Test
+    void shouldThrowCoffeeMachineExceptionWhenThereIsAProblemWithMilkProvider() throws HeaterException {
+        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
+        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
+                .withSize(CoffeeSize.SMALL)
+                .withType(CoffeeType.ESPRESSO)
+                .build();
+
+        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
+                .withMilkAmount(10)
+                .withWaterAmounts(waterAmounts)
+                .build();
+
+        when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
+        when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
+        doThrow(HeaterException.class).when(milkProvider).heat();
+        Assertions.assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+    }
 }
