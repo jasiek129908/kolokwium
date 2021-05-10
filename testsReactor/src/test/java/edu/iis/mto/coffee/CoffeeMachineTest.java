@@ -3,7 +3,7 @@ package edu.iis.mto.coffee;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import edu.iis.mto.coffee.machine.*;
 import org.hamcrest.MatcherAssert;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -66,5 +67,27 @@ class CoffeeMachineTest {
 
         when(coffeeReceipes.getReceipe(any(CoffeeType.class))).thenReturn(coffeeReceipe);
         Assertions.assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+    }
+
+    @Test
+    void shouldCallMilkProviderHeatAndThenPourIfCoffeeIsWithMilk() throws HeaterException {
+        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
+        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
+                .withSize(CoffeeSize.SMALL)
+                .withType(CoffeeType.ESPRESSO)
+                .build();
+
+        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
+                .withMilkAmount(10)
+                .withWaterAmounts(waterAmounts)
+                .build();
+
+        when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
+        when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
+
+        coffeeMachine.make(coffeeOrder);
+        InOrder in = inOrder(milkProvider);
+        in.verify(milkProvider).heat();
+        in.verify(milkProvider).pour(any(Integer.class));
     }
 }
