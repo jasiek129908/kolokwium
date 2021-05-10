@@ -38,13 +38,12 @@ class CoffeeMachineTest {
     }};
     @BeforeEach
     void setUp() throws Exception {
-        //coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
+        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
 
     }
 
     @Test
     void methodMakeShouldThrowCoffeeMachineExceptionWhenThereIsNoRecipe() {
-        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
         CoffeeOrder coffeeOrder = CoffeeOrder.builder()
                 .withSize(CoffeeSize.SMALL)
                 .withType(CoffeeType.ESPRESSO)
@@ -54,8 +53,7 @@ class CoffeeMachineTest {
     }
 
     @Test
-    void shouldThrowCoffeeMachineExceptionWhenThereOrderedCoffeeSizeIsNonSpecified() {
-        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
+    void shouldThrowCoffeeMachineExceptionWhenThereIsNoCoffeeBeansAvailable() {
         CoffeeOrder coffeeOrder = CoffeeOrder.builder()
                 .withSize(CoffeeSize.SMALL)
                 .withType(CoffeeType.ESPRESSO)
@@ -72,7 +70,6 @@ class CoffeeMachineTest {
 
     @Test
     void shouldCallMilkProviderHeatAndThenPourIfCoffeeIsWithMilk() throws HeaterException {
-        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
         CoffeeOrder coffeeOrder = CoffeeOrder.builder()
                 .withSize(CoffeeSize.SMALL)
                 .withType(CoffeeType.ESPRESSO)
@@ -94,7 +91,6 @@ class CoffeeMachineTest {
 
     @Test
     void shouldThrowCoffeeMachineExceptionWhenThereIsAProblemWithMilkProvider() throws HeaterException {
-        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
         CoffeeOrder coffeeOrder = CoffeeOrder.builder()
                 .withSize(CoffeeSize.SMALL)
                 .withType(CoffeeType.ESPRESSO)
@@ -113,7 +109,6 @@ class CoffeeMachineTest {
 
     @Test
     void onSuccessShouldReturnCoffee() throws HeaterException {
-        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
         CoffeeOrder coffeeOrder = CoffeeOrder.builder()
                 .withSize(CoffeeSize.SMALL)
                 .withType(CoffeeType.ESPRESSO)
@@ -132,7 +127,6 @@ class CoffeeMachineTest {
 
     @Test
     void shouldPourProperAmountOfMilkToACoffee() {
-        coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
         CoffeeOrder coffeeOrder = CoffeeOrder.builder()
                 .withSize(CoffeeSize.SMALL)
                 .withType(CoffeeType.ESPRESSO)
