@@ -31,55 +31,40 @@ class CoffeeMachineTest {
     private CoffeeReceipes coffeeReceipes;
 
     private CoffeeMachine coffeeMachine;
-    private Map<CoffeeSize, Integer> waterAmounts= new HashMap<>(){{
-        put(CoffeeSize.SMALL,5);
-        put(CoffeeSize.STANDARD,10);
-        put(CoffeeSize.DOUBLE,20);
+    private Map<CoffeeSize, Integer> waterAmounts = new HashMap<>() {{
+        put(CoffeeSize.SMALL, 5);
+        put(CoffeeSize.STANDARD, 10);
+        put(CoffeeSize.DOUBLE, 20);
     }};
+    private CoffeeOrder coffeeOrder;
+    private CoffeeReceipe coffeeReceipe;
+
     @BeforeEach
     void setUp() throws Exception {
         coffeeMachine = new CoffeeMachine(coffeeGrinder, milkProvider, coffeeReceipes);
-
+        coffeeOrder = CoffeeOrder.builder()
+                .withSize(CoffeeSize.SMALL)
+                .withType(CoffeeType.ESPRESSO)
+                .build();
+        coffeeReceipe = CoffeeReceipe.builder()
+                .withMilkAmount(10)
+                .withWaterAmounts(waterAmounts)
+                .build();
     }
 
     @Test
     void methodMakeShouldThrowCoffeeMachineExceptionWhenThereIsNoRecipe() {
-        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
-                .withSize(CoffeeSize.SMALL)
-                .withType(CoffeeType.ESPRESSO)
-                .build();
-
-        assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+        assertThrows(CoffeeMachineException.class, () -> coffeeMachine.make(coffeeOrder));
     }
 
     @Test
     void shouldThrowCoffeeMachineExceptionWhenThereIsNoCoffeeBeansAvailable() {
-        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
-                .withSize(CoffeeSize.SMALL)
-                .withType(CoffeeType.ESPRESSO)
-                .build();
-
-        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
-                .withMilkAmount(10)
-                .withWaterAmounts(waterAmounts)
-                .build();
-
         when(coffeeReceipes.getReceipe(any(CoffeeType.class))).thenReturn(coffeeReceipe);
-        assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+        assertThrows(CoffeeMachineException.class, () -> coffeeMachine.make(coffeeOrder));
     }
 
     @Test
     void shouldCallMilkProviderHeatAndThenPourIfCoffeeIsWithMilk() throws HeaterException {
-        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
-                .withSize(CoffeeSize.SMALL)
-                .withType(CoffeeType.ESPRESSO)
-                .build();
-
-        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
-                .withMilkAmount(10)
-                .withWaterAmounts(waterAmounts)
-                .build();
-
         when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
         when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
 
@@ -91,34 +76,14 @@ class CoffeeMachineTest {
 
     @Test
     void shouldThrowCoffeeMachineExceptionWhenThereIsAProblemWithMilkProvider() throws HeaterException {
-        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
-                .withSize(CoffeeSize.SMALL)
-                .withType(CoffeeType.ESPRESSO)
-                .build();
-
-        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
-                .withMilkAmount(10)
-                .withWaterAmounts(waterAmounts)
-                .build();
-
         when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
         when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
         doThrow(HeaterException.class).when(milkProvider).heat();
-        assertThrows(CoffeeMachineException.class,()->coffeeMachine.make(coffeeOrder));
+        assertThrows(CoffeeMachineException.class, () -> coffeeMachine.make(coffeeOrder));
     }
 
     @Test
     void onSuccessShouldReturnCoffee() throws HeaterException {
-        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
-                .withSize(CoffeeSize.SMALL)
-                .withType(CoffeeType.ESPRESSO)
-                .build();
-
-        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
-                .withMilkAmount(10)
-                .withWaterAmounts(waterAmounts)
-                .build();
-
         when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
         when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
         Coffee coffee = coffeeMachine.make(coffeeOrder);
@@ -127,21 +92,11 @@ class CoffeeMachineTest {
 
     @Test
     void shouldPourProperAmountOfMilkToACoffee() {
-        CoffeeOrder coffeeOrder = CoffeeOrder.builder()
-                .withSize(CoffeeSize.SMALL)
-                .withType(CoffeeType.ESPRESSO)
-                .build();
-
-        CoffeeReceipe coffeeReceipe = CoffeeReceipe.builder()
-                .withMilkAmount(10)
-                .withWaterAmounts(waterAmounts)
-                .build();
-
         when(coffeeReceipes.getReceipe(CoffeeType.ESPRESSO)).thenReturn(coffeeReceipe);
         when(coffeeGrinder.grind(any(CoffeeSize.class))).thenReturn(true);
         when(milkProvider.pour(coffeeReceipe.getMilkAmount())).thenReturn(coffeeReceipe.getMilkAmount());
         Coffee make = coffeeMachine.make(coffeeOrder);
-        assertEquals(10,make.getMilkAmout());
+        assertEquals(10, make.getMilkAmout());
     }
 
 }
